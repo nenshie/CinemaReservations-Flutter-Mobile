@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class MovieCard extends StatelessWidget {
   final String title;
   final String imagePath;
-  final String ageLimit;
+  final String rate;
 
   const MovieCard({
     super.key,
     required this.title,
     required this.imagePath,
-    this.ageLimit = '12A',
+    this.rate = '5',
   });
 
   @override
@@ -34,9 +34,20 @@ class MovieCard extends StatelessWidget {
               color: Colors.black.withOpacity(0.6),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              ageLimit,
-              style: const TextStyle(color: Colors.white),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  rate,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                  size: 16,
+                ),
+              ],
             ),
           ),
         ),
