@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cinema_reservations_front/components/movie_card.dart';
+import 'package:cinema_reservations_front/utils/global_colors.dart';
+import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,104 +11,91 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+
+  void _onNavBarTap(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(30),
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/f5e87e04-7a2c-4d45-8da0-70f3cefb2ceb.png"), // Dodaj u pubspec.yaml ako nije
-            fit: BoxFit.cover,
-            opacity: 0.2,
-          ),
-        ),
+      backgroundColor: GlobalColors.black,
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "WELCOME TO",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Text(
+                "Zdravo, Sandra",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 18,
+                ),
               ),
             ),
-            const SizedBox(height: 5),
-            const Text(
-              "CINEFLIX",
-              style: TextStyle(
-                color: Color(0xFFFF1D45),
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Text(
+                    "Repertoar",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Spacer(),
+                  Text(
+                    "dolazi uskoro",
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Your gateway to unlimited movies.\nPick. Reserve. Enjoy.",
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: 16,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: const [
+                    MovieCard(
+                      title: "Oppenheimer",
+                      imagePath: "assets/oppenheimer.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "Angels & Demons",
+                      imagePath: "assets/angels.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The Menu",
+                      imagePath: "assets/menu.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The King's Man",
+                      imagePath: "assets/kingsman.png",
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF1D45),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 32,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'login/');
-                  },
-                  child: const Text(
-                    'Log In',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white38),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 32,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'signIn/');
-                  },
-                  child: const Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: _onNavBarTap,
       ),
     );
   }
