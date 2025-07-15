@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
               child: Text(
                 "Zdravo, Sandra",
                 style: TextStyle(
@@ -38,20 +38,20 @@ class _HomeState extends State<Home> {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   Text(
-                    "Repertoar",
+                    "Najbolje ocenjeni",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Spacer(),
                   Text(
-                    "dolazi uskoro",
+                    "Dolazi uskoro",
                     style: TextStyle(
                       color: Colors.white38,
                       fontSize: 16,
@@ -80,6 +80,54 @@ class _HomeState extends State<Home> {
                     MovieCard(
                       title: "The Menu",
                       imagePath: "assets/menu.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The King's Man",
+                      imagePath: "assets/kingsman.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The King's Man",
+                      imagePath: "assets/kingsman.png",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Text(
+              "Repertoar",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: const [
+                    MovieCard(
+                      title: "Oppenheimer",
+                      imagePath: "assets/oppenheimer.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "Angels & Demons",
+                      imagePath: "assets/angels.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The Menu",
+                      imagePath: "assets/menu.png",
+                    ),
+                    SizedBox(width: 12),
+                    MovieCard(
+                      title: "The King's Man",
+                      imagePath: "assets/kingsman.png",
                     ),
                     SizedBox(width: 12),
                     MovieCard(

@@ -52,7 +52,7 @@ class MovieCard extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 8,
+          top: 255,
           left: 8,
           right: 8,
           child: Text(
