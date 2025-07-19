@@ -5,13 +5,15 @@ class User {
   final String jmbg;
   final String role;
   final String? password;
+  final String? mobileNumber;
 
-  User({
+  User( {
     required this.name,
     required this.surname,
     required this.email,
     required this.jmbg,
     required this.role,
+    required this.mobileNumber,
     this.password,
   });
 
@@ -23,6 +25,7 @@ class User {
       jmbg: json['jmbg'] ?? '',
       role: json['role'] ?? '',
       password: json['password'] ?? '',
+      mobileNumber: json['mobileNumber']?.toString(),
     );
   }
 
@@ -33,6 +36,7 @@ class User {
     String? jmbg,
     String? role,
     String? password,
+    String? mobileNumber,
   }) {
     return User(
       name: name ?? this.name,
@@ -41,6 +45,7 @@ class User {
       jmbg: jmbg ?? this.jmbg,
       role: role ?? this.role,
       password: password ?? this.password,
+      mobileNumber: mobileNumber ?? this.mobileNumber
     );
   }
 }

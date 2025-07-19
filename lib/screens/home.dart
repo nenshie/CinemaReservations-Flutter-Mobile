@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/components/movie_card.dart';
 import 'package:cinema_reservations_front/utils/global_colors.dart';
 import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -21,17 +24,20 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
+    final userName = user != null ? '${user.name} ${user.surname}' : 'User';
+
     return Scaffold(
       backgroundColor: GlobalColors.black,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
               child: Text(
-                "Zdravo, Sandra",
-                style: TextStyle(
+                "Hello, $userName",
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 18,
                 ),
@@ -42,7 +48,7 @@ class _HomeState extends State<Home> {
               child: Row(
                 children: [
                   Text(
-                    "Najbolje ocenjeni",
+                    "Top Rated",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -51,7 +57,7 @@ class _HomeState extends State<Home> {
                   ),
                   Spacer(),
                   Text(
-                    "Dolazi uskoro",
+                    "Coming Soon",
                     style: TextStyle(
                       color: Colors.white38,
                       fontSize: 16,
@@ -96,7 +102,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             Text(
-              "Repertoar",
+              "Repertoire",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,

@@ -70,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, 'login/');
+                    Navigator.pushNamed(context, '/login');
                   },
                   child: const Text(
                     'Log In',
@@ -82,7 +82,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white38),
+                    backgroundColor: GlobalColors.darkGrey,
+                    side: BorderSide(color: GlobalColors.darkGrey),
                     padding: const EdgeInsets.symmetric(
                       vertical: 14,
                       horizontal: 32,
@@ -92,7 +93,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, 'signIn/');
+                    Navigator.pushNamed(context, '/signIn');
                   },
                   child: const Text(
                     'Sign Up',

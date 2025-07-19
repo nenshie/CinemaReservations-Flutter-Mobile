@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cinema_reservations_front/models//user.dart';
+import 'package:cinema_reservations_front/models/user.dart';
 
 
 class UserProvider with ChangeNotifier {
