@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:cinema_reservations_front/screens/logIn.dart';
+import 'package:cinema_reservations_front/screens/sign_in.dart';
 import 'package:flutter/material.dart';
-import 'screens/welcome_screen.dart';
-import 'screens/home.dart';
+import 'package:cinema_reservations_front/screens/welcome_screen.dart';
+import 'package:cinema_reservations_front/screens/home.dart';
+import 'package:provider/provider.dart';
+import 'package:cinema_reservations_front/providers/user_provider.dart'; // ← dodaj ovo
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -14,7 +18,15 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,10 +36,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/home',
+      initialRoute: '/welcome',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/home': (context) => const Home(),
+        '/login': (context) => const Login(),
+        '/signIn': (context) => const SignIn(),
       },
     );
   }
