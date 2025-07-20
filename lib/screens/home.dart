@@ -3,8 +3,8 @@ import 'package:cinema_reservations_front/components/movie_card.dart';
 import 'package:cinema_reservations_front/utils/global_colors.dart';
 import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
-
 import '../providers/user_provider.dart';
+import '../widgets/global_navbar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -29,6 +29,7 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       backgroundColor: GlobalColors.black,
+      appBar: const NavBar(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,12 +102,15 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-            Text(
-              "Repertoire",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Text(
+                "Repertoire",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 10),
