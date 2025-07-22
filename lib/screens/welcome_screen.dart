@@ -19,7 +19,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         padding: const EdgeInsets.all(30),
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/f5e87e04-7a2c-4d45-8da0-70f3cefb2ceb.png"),
+            image: AssetImage("assets/cineflix-logo.jpg"),
             fit: BoxFit.cover,
             opacity: 0.2,
           ),

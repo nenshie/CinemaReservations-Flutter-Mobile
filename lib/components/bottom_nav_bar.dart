@@ -53,12 +53,12 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today_outlined),
               activeIcon: Icon(Icons.calendar_today),
-              label: 'My Bookings',
+              label: 'Projection',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_activity_outlined),
               activeIcon: Icon(Icons.local_activity),
-              label: 'Tickets',
+              label: 'My Tickets',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
