@@ -54,7 +54,7 @@ class _LoginState extends State<Login> {
               jmbg: userData['jmbg'] ?? '',
               name: userData['name'] ?? '',
               surname: userData['surname'] ?? '',
-              MobileNumber: userData['MobileNumber'],
+              MobileNumber: userData['phoneNumber'],
               email: userData['email'] ?? '',
             );
 
