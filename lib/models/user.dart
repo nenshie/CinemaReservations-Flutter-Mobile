@@ -25,7 +25,7 @@ class User {
       jmbg: json['jmbg'] ?? '',
       role: json['role'] ?? '',
       password: json['password'] ?? '',
-      MobileNumber: json['MobileNumber']?.toString(),
+      MobileNumber: json['phoneNumber']?.toString(),
     );
   }
 
