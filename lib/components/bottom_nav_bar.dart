@@ -35,7 +35,25 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           backgroundColor: GlobalColors.red,
           elevation: 0,
           currentIndex: widget.currentIndex,
-          onTap: widget.onTap,
+          onTap:  (index) {
+            if (index != widget.currentIndex) {
+              widget.onTap(index);
+              switch (index) {
+                case 0:
+                  Navigator.pushReplacementNamed(context, '/home');
+                  break;
+                case 1:
+                  Navigator.pushReplacementNamed(context, '/projections');
+                  break;
+                case 2:
+                  Navigator.pushReplacementNamed(context, '/tickets');
+                  break;
+                case 3:
+                  Navigator.pushReplacementNamed(context, '/profile');
+                  break;
+              }
+            }
+          },
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white70,
           selectedLabelStyle: const TextStyle(
