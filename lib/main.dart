@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/screens/welcome_screen.dart';
 import 'package:cinema_reservations_front/screens/home.dart';
 import 'package:provider/provider.dart';
-import 'package:cinema_reservations_front/providers/user_provider.dart'; // ← dodaj ovo
+import 'package:cinema_reservations_front/providers/user_provider.dart';
+import 'package:cinema_reservations_front/screens/projection.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const Home(),
         '/login': (context) => const Login(),
         '/signIn': (context) => const SignIn(),
+        '/projections': (context) => const Projections()
       },
     );
   }

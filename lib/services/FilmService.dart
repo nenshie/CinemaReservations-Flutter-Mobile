@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:cinema_reservations_front/models/dto/Film.dart';
+import 'package:cinema_reservations_front/models/dto/FilmDto.dart';
 class FilmService {
   static const String ipPort = "10.0.2.2:5215";
   static const String baseUrl = "http://$ipPort/api/film";
@@ -8,17 +8,23 @@ class FilmService {
   Future<List<Film>> fetchAllFilms() async {
 
     final queryParameters = {
-      'filterBy': '',
-      'filterValue': '',
+      'filterBy': 'genre',
+      'filterValue': 'action',
       'sortBy': 'Time',
       'ascending': 'true',
       'pageNumber': '1',
-      'pageSize': '10',
+      'pageSize': '5',
     };
 
     final uri = Uri.parse(baseUrl).replace(queryParameters: queryParameters);
 
     final response = await http.get(uri);
+
+    print('--- FILMS FETCH LOG ---');
+    print("URL: $uri");
+    print("Status code: ${response.statusCode}");
+    print("Response body: ${response.body}");
+    print('------------------------');
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       return data.map((filmJson) => Film.fromJson(filmJson)).toList();

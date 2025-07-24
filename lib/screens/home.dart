@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../widgets/global_navbar.dart';
 import '../services/FilmService.dart';
-import '../models/dto/Film.dart';
+import '../models/dto/FilmDto.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,7 +16,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
   late Future<List<Film>> _filmsFuture;
 
   @override
@@ -26,9 +26,21 @@ class _HomeState extends State<Home> {
   }
 
   void _onNavBarTap(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index != _currentIndex) {
+      switch (index) {
+        case 0:
+          break;
+        case 1:
+          Navigator.pushReplacementNamed(context, '/projections');
+          break;
+        case 2:
+          Navigator.pushReplacementNamed(context, '/tickets');
+          break;
+        case 3:
+          Navigator.pushReplacementNamed(context, '/profile');
+          break;
+      }
+    }
   }
 
   Widget _buildFilmList(List<Film> films) {
@@ -40,8 +52,6 @@ class _HomeState extends State<Home> {
         itemCount: films.length,
         itemBuilder: (context, index) {
           final film = films[index];
-          print('Image URL: ${film.posterUrl}');
-
           return Padding(
             padding: const EdgeInsets.only(right: 12),
             child: MovieCard(
@@ -78,8 +88,6 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-
-              // Now Showing naslov
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
@@ -117,8 +125,6 @@ class _HomeState extends State<Home> {
               ),
 
               const SizedBox(height: 20),
-
-              // Top Rated naslov
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
