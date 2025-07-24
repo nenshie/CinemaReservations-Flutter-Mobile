@@ -1,8 +1,7 @@
+import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
 import 'package:flutter/material.dart';
-import 'package:cinema_reservations_front/models/dto/FilmDto.dart';
-import 'package:cinema_reservations_front/services/FilmService.dart';
-import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
+
 import '../services/ProjectionService.dart';
 
 class Projections extends StatefulWidget {
@@ -53,13 +52,35 @@ class _ProjectionsState extends State<Projections> {
     }
   }
 
+  String formatProjectionDateTime(String rawDate, String rawTime) {
+    try {
+      final date = DateTime.parse(rawDate);
+      final time = DateTime.parse(rawTime);
+
+      final formattedDate = '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+      final formattedTime = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
+      return '📅 $formattedDate\n🕒 $formattedTime';
+    } catch (e) {
+      return '$rawDate $rawTime';
+    }
+  }
+
   Widget buildFilmCard(Projection projection) {
-    return Card(
+    return GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            '/makeReservation',
+            arguments: projection,
+          );
+        },
+    child:  Card(
       color: Colors.grey[900],
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SizedBox(
-        height: 120,
+        height: 140,
         child: Row(
           children: [
             ClipRRect(
@@ -67,12 +88,12 @@ class _ProjectionsState extends State<Projections> {
               child: Image.network(
                 projection.film.posterUrl,
                 width: 100,
-                height: 115,
+                height: 140,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     width: 100,
-                    height: 115,
+                    height: 140,
                     color: Colors.grey.shade800,
                     child: const Icon(Icons.broken_image, color: Colors.white),
                   );
@@ -91,19 +112,33 @@ class _ProjectionsState extends State<Projections> {
                       projection.film.title,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      formatDuration(projection.film.duration),
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          formatDuration(projection.film.duration),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          formatProjectionDateTime(projection.date, projection.time),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -112,8 +147,10 @@ class _ProjectionsState extends State<Projections> {
           ],
         ),
       ),
+    ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
