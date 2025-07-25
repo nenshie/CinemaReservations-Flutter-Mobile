@@ -20,11 +20,6 @@ class FilmService {
 
     final response = await http.get(uri);
 
-    print('--- FILMS FETCH LOG ---');
-    print("URL: $uri");
-    print("Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
-    print('------------------------');
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       return data.map((filmJson) => Film.fromJson(filmJson)).toList();
