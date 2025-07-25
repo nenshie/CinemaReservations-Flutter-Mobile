@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
-
+import 'package:cinema_reservations_front/models/dto/SeatDto.dart';
+import 'package:cinema_reservations_front/services/SeatService.dart';
 import '../utils/global_colors.dart';
 
 class MakeReservation extends StatefulWidget {
@@ -13,7 +14,11 @@ class MakeReservation extends StatefulWidget {
 
 class _MakeReservationState extends State<MakeReservation> {
   final int _currentIndex = 1;
-  final List<List<bool>> seatSelection = List.generate(5, (_) => List.filled(8, false)); // 5 redova po 8 mesta
+  final SeatService seatService = SeatService();
+
+  List<Seat> takenSeats = [];
+  bool isLoading = true;
+  List<int> selectedSeats = [];
 
   void _onNavBarTap(int index) {
     if (index != _currentIndex) {
@@ -61,27 +66,54 @@ class _MakeReservationState extends State<MakeReservation> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final projection = ModalRoute.of(context)!.settings.arguments as Projection;
+      _loadTakenSeats(projection.room.roomId, projection.film.filmId);
+    });
+  }
+
+  Future<void> _loadTakenSeats(int roomId, int filmId) async {
+    try {
+      final seats = await seatService.fetchAllSeatsForRoom(roomId, filmId);
+      setState(() {
+        takenSeats = seats;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Greška prilikom učitavanja sedišta: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  bool isSeatTaken(int seatNumber) {
+    return takenSeats.any((seat) => seat.seatNumber == seatNumber);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final projection = ModalRoute.of(context)!.settings.arguments as Projection;
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Reservation',
-        style: const TextStyle(fontWeight: FontWeight.bold)
-        ),
+        title: const Text('Reservation', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
       ),
-      body: Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(15),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Poster
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -93,7 +125,7 @@ class _MakeReservationState extends State<MakeReservation> {
                       width: 120,
                       height: 200,
                       color: Colors.grey[800],
-                      child: Icon(Icons.broken_image, color: Colors.white),
+                      child: const Icon(Icons.broken_image, color: Colors.white),
                     ),
                   ),
                 ),
@@ -106,26 +138,15 @@ class _MakeReservationState extends State<MakeReservation> {
                         projection.film.title,
                         style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            formatDuration(projection.film.duration),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            formatProjectionDateTime(projection.date, projection.time),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 8),
+                      Text(
+                        formatDuration(projection.film.duration),
+                        style: const TextStyle(color: Colors.white70, fontSize: 18),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        formatProjectionDateTime(projection.date, projection.time),
+                        style: const TextStyle(color: Colors.white70, fontSize: 16, height: 1.5),
                       ),
                     ],
                   ),
@@ -133,7 +154,6 @@ class _MakeReservationState extends State<MakeReservation> {
               ],
             ),
           ),
-
           const Divider(color: Colors.white24),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
@@ -145,28 +165,46 @@ class _MakeReservationState extends State<MakeReservation> {
               child: Wrap(
                 spacing: 15,
                 runSpacing: 15,
-                children: [
-                  ...List.generate(projection.room.capacity, (index) {
+                children: List.generate(
+                  projection.room.capacity,
+                      (index) {
+                    final seatNumber = index + 1;
+                    final isTaken = isSeatTaken(seatNumber);
+                    final isSelected = selectedSeats.contains(seatNumber);
+
                     return GestureDetector(
                       onTap: () {
-                        // selektuj sedište
+                        if (!isTaken) {
+                          setState(() {
+                            if (isSelected) {
+                              selectedSeats.remove(seatNumber);
+                            } else {
+                              selectedSeats.add(seatNumber);
+                            }
+                          });
+                        }
                       },
                       child: Icon(
                         Icons.chair,
-                        color: Colors.white,
+                        color: isTaken
+                            ? Colors.grey
+                            : isSelected
+                            ? GlobalColors.red
+                            : Colors.white,
                         size: 33,
                       ),
                     );
-                  }),
-                ],
+                  },
+                ),
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(20),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: selectedSeats.isEmpty
+                  ? null
+                  : () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Rezervacija poslana (dummy)!")),
                 );
@@ -176,7 +214,7 @@ class _MakeReservationState extends State<MakeReservation> {
                 padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
-              child: const Text("Rezerviši", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.normal)),
+              child: const Text("Rezerviši", style: TextStyle(fontSize: 20, color: Colors.white)),
             ),
           ),
         ],
