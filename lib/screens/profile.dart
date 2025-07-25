@@ -40,16 +40,15 @@ class _ProfileState extends State<Profile> {
 
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, 'mainScreen/');
+        Navigator.pushReplacementNamed(context, '/home');
         break;
       case 1:
-        Navigator.pushReplacementNamed(context, 'trainings/');
+        Navigator.pushReplacementNamed(context, '/projections');
         break;
       case 2:
-        Navigator.pushReplacementNamed(context, 'reservations/');
+        Navigator.pushReplacementNamed(context, '/tickets');
         break;
       case 3:
-        Navigator.pushReplacementNamed(context, 'profile/');
         break;
     }
   }
