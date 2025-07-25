@@ -6,10 +6,11 @@ class SeatService {
   static const String ipPort = "10.0.2.2:5215";
   static const String baseUrl = "http://$ipPort/api/seat";
 
-  Future<List<Seat>> fetchAllSeatsForRoom(int roomId) async {
+  Future<List<Seat>> fetchAllSeatsForRoom(int roomId, int filmId) async {
 
     final queryParameters = {
-      'roomId': roomId
+      'roomId': roomId,
+      'filmId': filmId
     };
 
     final uri = Uri.parse(baseUrl).replace(queryParameters: queryParameters);
