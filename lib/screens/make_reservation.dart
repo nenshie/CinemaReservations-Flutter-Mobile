@@ -20,22 +20,32 @@ class _MakeReservationState extends State<MakeReservation> {
   bool isLoading = true;
   List<int> selectedSeats = [];
 
-  void _onNavBarTap(int index) {
-    if (index != _currentIndex) {
-      switch (index) {
-        case 0:
-          Navigator.pushReplacementNamed(context, '/home');
-          break;
-        case 1:
-          break;
-        case 2:
-          Navigator.pushReplacementNamed(context, '/tickets');
-          break;
-        case 3:
-          Navigator.pushReplacementNamed(context, '/profile');
-          break;
-      }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final projection = ModalRoute.of(context)!.settings.arguments as Projection;
+      _loadTakenSeats(projection.projectionId);
+    });
+  }
+
+  Future<void> _loadTakenSeats(int projectionId) async {
+    try {
+      final seats = await seatService.fetchSeatsWithAvailability(projectionId);
+      setState(() {
+        takenSeats = seats;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Greška prilikom učitavanja sedišta: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  bool isSeatTaken(int seatNumber) {
+    return takenSeats.any((seat) => seat.seatNumber == seatNumber);
   }
 
   String formatDuration(int minutes) {
@@ -56,8 +66,10 @@ class _MakeReservationState extends State<MakeReservation> {
       final date = DateTime.parse(rawDate);
       final time = DateTime.parse(rawTime);
 
-      final formattedDate = '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-      final formattedTime = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final formattedDate =
+          '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+      final formattedTime =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       return 'Date:  $formattedDate\nTime: $formattedTime';
     } catch (e) {
@@ -65,32 +77,22 @@ class _MakeReservationState extends State<MakeReservation> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final projection = ModalRoute.of(context)!.settings.arguments as Projection;
-      _loadTakenSeats(projection.room.roomId, projection.film.filmId);
-    });
-  }
-
-  Future<void> _loadTakenSeats(int roomId, int filmId) async {
-    try {
-      final seats = await seatService.fetchAllSeatsForRoom(roomId, filmId);
-      setState(() {
-        takenSeats = seats;
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Greška prilikom učitavanja sedišta: $e');
-      setState(() {
-        isLoading = false;
-      });
+  void _onNavBarTap(int index) {
+    if (index != _currentIndex) {
+      switch (index) {
+        case 0:
+          Navigator.pushReplacementNamed(context, '/home');
+          break;
+        case 1:
+          break;
+        case 2:
+          Navigator.pushReplacementNamed(context, '/tickets');
+          break;
+        case 3:
+          Navigator.pushReplacementNamed(context, '/profile');
+          break;
+      }
     }
-  }
-
-  bool isSeatTaken(int seatNumber) {
-    return takenSeats.any((seat) => seat.seatNumber == seatNumber);
   }
 
   @override
@@ -100,7 +102,8 @@ class _MakeReservationState extends State<MakeReservation> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Reservation', style: TextStyle(fontWeight: FontWeight.bold)),
+        title:
+        const Text('Reservation', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -136,17 +139,22 @@ class _MakeReservationState extends State<MakeReservation> {
                     children: [
                       Text(
                         projection.film.title,
-                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         formatDuration(projection.film.duration),
-                        style: const TextStyle(color: Colors.white70, fontSize: 18),
+                        style:
+                        const TextStyle(color: Colors.white70, fontSize: 18),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         formatProjectionDateTime(projection.date, projection.time),
-                        style: const TextStyle(color: Colors.white70, fontSize: 16, height: 1.5),
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 16, height: 1.5),
                       ),
                     ],
                   ),
@@ -157,7 +165,8 @@ class _MakeReservationState extends State<MakeReservation> {
           const Divider(color: Colors.white24),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
-            child: Text("Choose seats", style: TextStyle(color: Colors.white, fontSize: 18)),
+            child:
+            Text("Choose seats", style: TextStyle(color: Colors.white, fontSize: 18)),
           ),
           Expanded(
             child: Padding(
@@ -214,7 +223,8 @@ class _MakeReservationState extends State<MakeReservation> {
                 padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
-              child: const Text("Rezerviši", style: TextStyle(fontSize: 20, color: Colors.white)),
+              child: const Text("Rezerviši",
+                  style: TextStyle(fontSize: 20, color: Colors.white)),
             ),
           ),
         ],
