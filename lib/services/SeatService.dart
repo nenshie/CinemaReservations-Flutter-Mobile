@@ -25,4 +25,19 @@ class SeatService {
       throw Exception("Failed to load seats for roomId:$roomId");
     }
   }
+
+  Future<List<Seat>> fetchSeatsWithAvailability(int projectionId) async {
+    final uri = Uri.parse('http://10.0.2.2:5215/api/seat/availability')
+        .replace(queryParameters: {'projectionId': projectionId.toString()});
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((json) => Seat.fromJson(json)).toList();
+    } else {
+      throw Exception("Failed to fetch seats");
+    }
+  }
+
 }

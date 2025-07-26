@@ -1,26 +1,28 @@
 class Seat {
   final int seatId;
   final int roomId;
-  final int filmId;
+  final int projectionId;
   final int rowNumber;
   final int seatNumber;
+  final bool isTaken;
 
   Seat({
     required this.seatId,
     required this.roomId,
-    required this.filmId,
+    required this.projectionId,
     required this.rowNumber,
     required this.seatNumber,
+    required this.isTaken,
   });
 
   factory Seat.fromJson(Map<String, dynamic> json) {
     return Seat(
       seatId: json['seatId'],
       roomId: json['roomId'],
-      filmId: json['filmId'],
+      projectionId: json['projectionId'],
       rowNumber: json['rowNumber'],
       seatNumber: json['seatNumber'],
+      isTaken: json['isTaken'],
     );
   }
 }
-
