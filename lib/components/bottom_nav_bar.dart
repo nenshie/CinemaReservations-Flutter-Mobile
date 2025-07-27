@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/utils/global_colors.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
   final int currentIndex;
@@ -18,6 +21,33 @@ class CustomBottomNavBar extends StatefulWidget {
 class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+    final String role = user?.role ?? 'Client';
+
+    final bottomNavItems = [
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.movie_creation_outlined),
+        activeIcon: Icon(Icons.movie_creation),
+        label: 'Movies',
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.calendar_today_outlined),
+        activeIcon: Icon(Icons.calendar_today),
+        label: 'Projection',
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.local_activity_outlined),
+        activeIcon: const Icon(Icons.local_activity),
+        label: role == 'Admin' ? 'Admin' : 'My Tickets',
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.person_outline),
+        activeIcon: Icon(Icons.person),
+        label: 'Profile',
+      ),
+    ];
+
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       child: Container(
@@ -25,7 +55,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           color: GlobalColors.black,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black,
               blurRadius: 12,
               offset: const Offset(0, -6),
             ),
@@ -35,7 +65,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           backgroundColor: GlobalColors.red,
           elevation: 0,
           currentIndex: widget.currentIndex,
-          onTap:  (index) {
+          onTap: (index) {
             if (index != widget.currentIndex) {
               widget.onTap(index);
               switch (index) {
@@ -46,7 +76,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                   Navigator.pushReplacementNamed(context, '/projections');
                   break;
                 case 2:
-                  Navigator.pushReplacementNamed(context, '/tickets');
+                  Navigator.pushReplacementNamed(context,  '/tickets');
                   break;
                 case 3:
                   Navigator.pushReplacementNamed(context, '/profile');
@@ -62,30 +92,11 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           ),
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: false,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.movie_creation_outlined),
-              activeIcon: Icon(Icons.movie_creation),
-              label: 'Movies',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today_outlined),
-              activeIcon: Icon(Icons.calendar_today),
-              label: 'Projection',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_activity_outlined),
-              activeIcon: Icon(Icons.local_activity),
-              label: 'My Tickets',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
+          items: bottomNavItems,
         ),
       ),
     );
   }
+
 }
+
