@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cinema_reservations_front/screens/camera.dart';
 import 'package:cinema_reservations_front/screens/logIn.dart';
 import 'package:cinema_reservations_front/screens/make_reservation.dart';
 import 'package:cinema_reservations_front/screens/profile.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
         '/makeReservation' : (context) => const MakeReservation(),
         '/profile': (context) => const Profile(),
         '/tickets': (context) => const Tickets(),
+        '/camera' : (context) => QRScannerScreen(),
       },
     );
   }
