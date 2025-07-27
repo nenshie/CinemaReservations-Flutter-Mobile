@@ -99,10 +99,18 @@ class _TicketsState extends State<Tickets> {
           ),
           const SizedBox(height: 30),
           _buildAdminCard(
-            title: 'Films and Projections',
+            title: 'Films',
             icon: Icons.movie_filter_outlined,
             onTap: () {
               Navigator.pushNamed(context, '/films');
+            },
+          ),
+          const SizedBox(height: 30),
+          _buildAdminCard(
+            title: 'Projections',
+            icon: Icons.people_outline,
+            onTap: () {
+              Navigator.pushNamed(context, '/projections');
             },
           ),
         ],
