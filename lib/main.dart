@@ -3,6 +3,7 @@ import 'package:cinema_reservations_front/screens/logIn.dart';
 import 'package:cinema_reservations_front/screens/make_reservation.dart';
 import 'package:cinema_reservations_front/screens/profile.dart';
 import 'package:cinema_reservations_front/screens/sign_in.dart';
+import 'package:cinema_reservations_front/screens/tickets.dart';
 import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/screens/welcome_screen.dart';
 import 'package:cinema_reservations_front/screens/home.dart';
@@ -47,7 +48,8 @@ class MyApp extends StatelessWidget {
         '/signIn': (context) => const SignIn(),
         '/projections': (context) => const Projections(),
         '/makeReservation' : (context) => const MakeReservation(),
-        '/profile': (context) => const Profile()
+        '/profile': (context) => const Profile(),
+        '/tickets': (context) => const Tickets(),
       },
     );
   }
