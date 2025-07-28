@@ -1,12 +1,14 @@
 class Room {
   final int roomId;
   final String name;
-  final int capacity;
+  final int numberOfRows;
+  final int seatsPerRow;
 
   Room({
     required this.roomId,
     required this.name,
-    required this.capacity
+    required this.numberOfRows,
+    required this.seatsPerRow
   });
 
 
@@ -14,7 +16,8 @@ class Room {
     return Room(
       roomId: json['roomId'],
       name: json['name'] ?? 'Unknown Room name',
-      capacity  : json['capacity'] ?? 0,
+      numberOfRows  : json['numberOfRows'] ?? 0,
+      seatsPerRow  : json['seatsPerRow'] ?? 0,
     );
   }
 }

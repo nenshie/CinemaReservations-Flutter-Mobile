@@ -91,7 +91,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             fontSize: 12,
           ),
           type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: false,
+          showUnselectedLabels: true,
           items: bottomNavItems,
         ),
       ),

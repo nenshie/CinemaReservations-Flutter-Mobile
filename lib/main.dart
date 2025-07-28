@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
         '/makeReservation' : (context) => const MakeReservation(),
         '/profile': (context) => const Profile(),
         '/tickets': (context) => const Tickets(),
-        '/camera' : (context) => QRScannerScreen(),
-        '/films' : (context) => FilmsScreen(),
+        '/camera' : (context) =>  QRScannerScreen(),
+        '/films' : (context) => const FilmsScreen(),
       },
     );
   }
