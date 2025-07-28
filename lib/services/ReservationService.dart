@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
+import 'package:cinema_reservations_front/models/dto/ReservationDto.dart';
 import 'package:cinema_reservations_front/models/dto/SeatDto.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,8 +9,8 @@ class ReservationService {
   static const String baseUrl = "http://$ipPort/api/reservation";
 
 
-  Future<bool> makeReservation(int userId, int projectionId, List<Seat> seats) async {
-    final url = Uri.parse(baseUrl);
+  Future<bool> makeReservation(String userId, int projectionId, List<Seat> seats) async {
+    final url = Uri.parse("$baseUrl/make");
 
     final seatsJson = seats.map((seat) => seat.toJson()).toList();
 
@@ -54,6 +55,25 @@ class ReservationService {
       return data.map((projectionJson) => Projection.fromJson(projectionJson)).toList();
     } else {
       throw Exception("Failed to load reservations");
+    }
+  }
+
+  Future<List<Reservation>> getMyReservations(String userId) async {
+    final uri = Uri.parse("$baseUrl/user/$userId");
+
+    final response = await http.get(uri);
+
+    print('--- GET MY RESERVATIONS LOG ---');
+    print("URL: $uri");
+    print("Status code: ${response.statusCode}");
+    print("Response body: ${response.body}");
+    print('----------------------------');
+
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((resJson) => Reservation.fromJson(resJson)).toList();
+    } else {
+      throw Exception("Failed to load user reservations");
     }
   }
 }

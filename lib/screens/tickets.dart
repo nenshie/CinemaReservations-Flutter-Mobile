@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../components/bottom_nav_bar.dart';
 import '../providers/user_provider.dart';
 import '../utils/global_colors.dart';
+import 'dart:convert';
+import '../models/dto/ReservationDto.dart';
+import '../services/ReservationService.dart';
 
 class Tickets extends StatefulWidget {
   const Tickets({super.key});
@@ -13,6 +16,9 @@ class Tickets extends StatefulWidget {
 
 class _TicketsState extends State<Tickets> {
   int _selectedIndex = 2;
+  final ReservationService reservationService = ReservationService();
+  bool isLoading = true;
+  List<Reservation> myReservations = [];
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
@@ -34,6 +40,29 @@ class _TicketsState extends State<Tickets> {
       case 3:
         Navigator.pushReplacementNamed(context, '/profile');
         break;
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadMyReservations());
+  }
+
+  Future<void> _loadMyReservations() async {
+    try {
+      final user = Provider.of<UserProvider>(context, listen: false).user;
+      if (user == null) return;
+      final userId = user.jmbg;
+
+      final reservations = await reservationService.getMyReservations(userId);
+      setState(() {
+        myReservations = reservations;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -99,14 +128,6 @@ class _TicketsState extends State<Tickets> {
           ),
           const SizedBox(height: 30),
           _buildAdminCard(
-            title: 'Films',
-            icon: Icons.movie_filter_outlined,
-            onTap: () {
-              Navigator.pushNamed(context, '/films');
-            },
-          ),
-          const SizedBox(height: 30),
-          _buildAdminCard(
             title: 'Projections',
             icon: Icons.people_outline,
             onTap: () {
@@ -119,11 +140,70 @@ class _TicketsState extends State<Tickets> {
   }
 
   Widget _buildClientView() {
-    return const Center(
-      child: Text(
-        'Your Tickets',
-        style: TextStyle(fontSize: 20, color: Colors.white),
-      ),
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (myReservations.isEmpty) {
+      return const Center(
+        child: Text(
+          'Your Tickets',
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(15),
+      itemCount: myReservations.length,
+      itemBuilder: (context, index) {
+        final reservation = myReservations[index];
+        return Card(
+          color: Colors.grey[900],
+          margin: const EdgeInsets.only(bottom: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        reservation.filmTitle,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${reservation.date} ${reservation.time}',
+                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sedišta: ${reservation.seats.join(", ")}',
+                        style: const TextStyle(color: Colors.white54),
+                      ),
+                    ],
+                  ),
+                ),
+                // QR kod dekodiran iz base64
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: reservation.qrCodeBase64 != null
+                      ? Image.memory(
+                    base64Decode(reservation.qrCodeBase64!),
+                    fit: BoxFit.contain,
+                  )
+                      : const Icon(Icons.qr_code, color: Colors.white24, size: 80),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
