@@ -3,6 +3,7 @@ import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
 import 'package:cinema_reservations_front/models/dto/SeatDto.dart';
 import 'package:cinema_reservations_front/services/SeatService.dart';
+import '../services/ReservationService.dart';
 import '../utils/global_colors.dart';
 
 class MakeReservation extends StatefulWidget {
@@ -15,6 +16,7 @@ class MakeReservation extends StatefulWidget {
 class _MakeReservationState extends State<MakeReservation> {
   final int _currentIndex = 1;
   final SeatService seatService = SeatService();
+  final ReservationService reservationService = ReservationService();
 
   List<Seat> takenSeats = [];
   bool isLoading = true;
@@ -98,7 +100,8 @@ class _MakeReservationState extends State<MakeReservation> {
   @override
   Widget build(BuildContext context) {
     final projection = ModalRoute.of(context)!.settings.arguments as Projection;
-
+    print('Number of rows: ${projection.room.numberOfRows}');
+    print('Number of rows: ${projection.room.seatsPerRow}');
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -168,39 +171,68 @@ class _MakeReservationState extends State<MakeReservation> {
             child:
             Text("Choose seats", style: TextStyle(color: Colors.white, fontSize: 18)),
           ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 15),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 30),
+              decoration: BoxDecoration(
+                color: Colors.lightGreen,
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.white30),
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                "SCREEN",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Wrap(
-                spacing: 15,
-                runSpacing: 15,
+              child: Column(
                 children: List.generate(
-                  projection.room.capacity,
-                      (index) {
-                    final seatNumber = index + 1;
-                    final isTaken = isSeatTaken(seatNumber);
-                    final isSelected = selectedSeats.contains(seatNumber);
+                  projection.room.numberOfRows,
+                      (rowIndex) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        projection.room.seatsPerRow,
+                            (seatIndex) {
+                          final seatNumber = rowIndex * projection.room.seatsPerRow + seatIndex + 1;
+                          final isTaken = isSeatTaken(seatNumber);
+                          final isSelected = selectedSeats.contains(seatNumber);
 
-                    return GestureDetector(
-                      onTap: () {
-                        if (!isTaken) {
-                          setState(() {
-                            if (isSelected) {
-                              selectedSeats.remove(seatNumber);
-                            } else {
-                              selectedSeats.add(seatNumber);
-                            }
-                          });
-                        }
-                      },
-                      child: Icon(
-                        Icons.chair,
-                        color: isTaken
-                            ? Colors.grey
-                            : isSelected
-                            ? GlobalColors.red
-                            : Colors.white,
-                        size: 33,
+                          return GestureDetector(
+                            onTap: () {
+                              if (!isTaken) {
+                                setState(() {
+                                  if (isSelected) {
+                                    selectedSeats.remove(seatNumber);
+                                  } else {
+                                    selectedSeats.add(seatNumber);
+                                  }
+                                });
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.chair,
+                                color: isTaken
+                                    ? Colors.grey
+                                    : isSelected
+                                    ? GlobalColors.red
+                                    : Colors.white,
+                                size: 33,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
@@ -208,25 +240,56 @@ class _MakeReservationState extends State<MakeReservation> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: ElevatedButton(
-              onPressed: selectedSeats.isEmpty
-                  ? null
-                  : () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Rezervacija poslana (dummy)!")),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GlobalColors.red,
-                padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+
+          if (selectedSeats.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: ElevatedButton(
+                onPressed: selectedSeats.isEmpty
+                    ? null
+                    : () async {
+                  try {
+                    final int userId = 1;
+                    List<Seat> seatsToReserve = selectedSeats.map((seatNumber) {
+                      final rowNumber = (seatNumber - 1) ~/ projection.room.seatsPerRow + 1;
+                      final seatInRow = (seatNumber - 1) % projection.room.seatsPerRow + 1;
+
+                      return Seat(
+                        roomId: projection.room.roomId,
+                        projectionId: projection.projectionId,
+                        rowNumber: rowNumber,
+                        seatNumber: seatInRow,
+                        isTaken: false,
+                      );
+                    }).toList();
+
+                    await reservationService.makeReservation(userId, projection.projectionId, seatsToReserve);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Rezervacija uspešno poslana!")),
+                    );
+
+                    setState(() {
+                      selectedSeats.clear();
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Greška prilikom rezervacije: $e")),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: GlobalColors.red,
+                  padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                child: const Text(
+                  "Rezerviši",
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
               ),
-              child: const Text("Rezerviši",
-                  style: TextStyle(fontSize: 20, color: Colors.white)),
             ),
-          ),
+
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
