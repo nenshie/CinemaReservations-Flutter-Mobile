@@ -9,7 +9,7 @@ class ReservationService {
   static const String baseUrl = "http://$ipPort/api/reservation";
 
 
-  Future<bool> makeReservation(String userId, int projectionId, List<Seat> seats) async {
+  Future<bool> makeReservation(String? userId, int projectionId, List<Seat> seats) async {
     final url = Uri.parse("$baseUrl/make");
 
     final seatsJson = seats.map((seat) => seat.toJson()).toList();
@@ -76,4 +76,23 @@ class ReservationService {
       throw Exception("Failed to load user reservations");
     }
   }
+
+  Future<bool> confirmReservationFromQr(String qrContent, String userId) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:5215/api/reservation/confirm-from-qr'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "qrContent": qrContent,
+        "userId": userId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      print('Greška: ${response.body}');
+      return false;
+    }
+  }
+
 }

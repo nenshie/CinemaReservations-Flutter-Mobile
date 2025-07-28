@@ -3,8 +3,10 @@ import 'package:cinema_reservations_front/models/dto/OccupiedSeatDto.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
 import 'package:cinema_reservations_front/services/SeatService.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/dto/SeatDto.dart';
+import '../providers/user_provider.dart';
 import '../services/ReservationService.dart';
 import '../utils/global_colors.dart';
 
@@ -255,8 +257,9 @@ class _MakeReservationState extends State<MakeReservation> {
               child: ElevatedButton(
                 onPressed: () async {
                   try {
+                    final user = Provider.of<UserProvider>(context, listen: false).user;
                    // final String userId = Provider.of<UserProvider>(context, listen: false).user?.jmbg ?? '0';
-                    final String userId = '1';
+                    final String? userId = user?.jmbg;
 
                     List<Seat> seatsToReserve = selectedSeats.map((seatId) {
                       final parts = seatId.split('-');

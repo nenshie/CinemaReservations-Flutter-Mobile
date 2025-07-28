@@ -5,7 +5,7 @@ class FilmService {
   static const String ipPort = "10.0.2.2:5215";
   static const String baseUrl = "http://$ipPort/api/film";
 
-  Future<List<Film>> fetchAllFilms() async {
+  static Future<List<Film>> fetchAllFilms() async {
 
     final queryParameters = {
       'filterBy': 'genre',

@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _filmsFuture = FilmService().fetchAllFilms();
+    _filmsFuture = FilmService.fetchAllFilms();
   }
 
   void _onNavBarTap(int index) {
