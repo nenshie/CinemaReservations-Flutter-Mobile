@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
 import 'package:http/http.dart' as http;
-import 'package:cinema_reservations_front/models/dto/FilmDto.dart';
 class ProjectionService {
   static const String ipPort = "10.0.2.2:5215";
   static const String baseUrl = "http://$ipPort/api/projection";
@@ -24,5 +23,31 @@ class ProjectionService {
     } else {
       throw Exception("Failed to load projections");
     }
+  }
+
+  static Future<bool> addProjection({
+    required int filmId,
+    required int roomId,
+    required String date,
+  }) async {
+    final uri = Uri.parse(baseUrl);
+
+    final payload = {
+      "filmId": filmId,
+      "roomId": roomId,
+      "date": date.split("T")[0],
+      "time": date.split("T")[1],
+    };
+
+    final response = await http.post(
+      uri,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+
+    print("POST Projection => ${response.statusCode}");
+    print(response.body);
+
+    return response.statusCode == 201;
   }
 }
