@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
+import 'package:cinema_reservations_front/models/dto/OccupiedSeatDto.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
-import 'package:cinema_reservations_front/models/dto/SeatDto.dart';
 import 'package:cinema_reservations_front/services/SeatService.dart';
+import 'package:flutter/material.dart';
+
+import '../models/dto/SeatDto.dart';
 import '../services/ReservationService.dart';
 import '../utils/global_colors.dart';
 
@@ -18,9 +20,9 @@ class _MakeReservationState extends State<MakeReservation> {
   final SeatService seatService = SeatService();
   final ReservationService reservationService = ReservationService();
 
-  List<Seat> takenSeats = [];
+  List<OccupiedSeat> takenSeats = [];
   bool isLoading = true;
-  List<int> selectedSeats = [];
+  List<String> selectedSeats = [];
 
   @override
   void initState() {
@@ -46,8 +48,11 @@ class _MakeReservationState extends State<MakeReservation> {
     }
   }
 
-  bool isSeatTaken(int seatNumber) {
-    return takenSeats.any((seat) => seat.seatNumber == seatNumber);
+
+  bool isSeatTaken(int rowNumber, int seatNumber) {
+    return takenSeats.any(
+            (seat) => seat.row == rowNumber && seat.column == seatNumber && seat.isTaken
+    );
   }
 
   String formatDuration(int minutes) {
@@ -105,8 +110,7 @@ class _MakeReservationState extends State<MakeReservation> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title:
-        const Text('Reservation', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Reservation', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -203,18 +207,22 @@ class _MakeReservationState extends State<MakeReservation> {
                       children: List.generate(
                         projection.room.seatsPerRow,
                             (seatIndex) {
-                          final seatNumber = rowIndex * projection.room.seatsPerRow + seatIndex + 1;
-                          final isTaken = isSeatTaken(seatNumber);
-                          final isSelected = selectedSeats.contains(seatNumber);
+                          final rowNumber = rowIndex + 1;
+                          final seatNumberInRow = seatIndex + 1;
+
+                          final seatId = '$rowNumber-$seatNumberInRow';  // string ID
+
+                          final isTaken = isSeatTaken(rowNumber, seatNumberInRow);
+                          final isSelected = selectedSeats.contains(seatId);
 
                           return GestureDetector(
                             onTap: () {
                               if (!isTaken) {
                                 setState(() {
                                   if (isSelected) {
-                                    selectedSeats.remove(seatNumber);
+                                    selectedSeats.remove(seatId);
                                   } else {
-                                    selectedSeats.add(seatNumber);
+                                    selectedSeats.add(seatId);
                                   }
                                 });
                               }
@@ -245,14 +253,15 @@ class _MakeReservationState extends State<MakeReservation> {
             Padding(
               padding: const EdgeInsets.all(20),
               child: ElevatedButton(
-                onPressed: selectedSeats.isEmpty
-                    ? null
-                    : () async {
+                onPressed: () async {
                   try {
-                    final int userId = 1;
-                    List<Seat> seatsToReserve = selectedSeats.map((seatNumber) {
-                      final rowNumber = (seatNumber - 1) ~/ projection.room.seatsPerRow + 1;
-                      final seatInRow = (seatNumber - 1) % projection.room.seatsPerRow + 1;
+                   // final String userId = Provider.of<UserProvider>(context, listen: false).user?.jmbg ?? '0';
+                    final String userId = '1';
+
+                    List<Seat> seatsToReserve = selectedSeats.map((seatId) {
+                      final parts = seatId.split('-');
+                      final rowNumber = int.parse(parts[0]);
+                      final seatInRow = int.parse(parts[1]);
 
                       return Seat(
                         roomId: projection.room.roomId,
@@ -266,9 +275,9 @@ class _MakeReservationState extends State<MakeReservation> {
                     await reservationService.makeReservation(userId, projection.projectionId, seatsToReserve);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Rezervacija uspešno poslana!")),
+                      const SnackBar(content: Text("Uspešno ste rezervisali karte!")),
                     );
-
+                    Navigator.pushReplacementNamed(context, '/tickets');
                     setState(() {
                       selectedSeats.clear();
                     });
@@ -289,7 +298,6 @@ class _MakeReservationState extends State<MakeReservation> {
                 ),
               ),
             ),
-
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
