@@ -15,21 +15,14 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   int _selectedIndex = 3;
 
-  late TextEditingController _nameController;
-  late TextEditingController _surnameController;
   late TextEditingController _phoneController;
-  late TextEditingController _emailController;
   late TextEditingController _jmbgController;
 
   @override
   void initState() {
     super.initState();
     final user = Provider.of<UserProvider>(context, listen: false).user;
-
-    _nameController = TextEditingController(text: user?.name ?? '');
-    _surnameController = TextEditingController(text: user?.surname ?? '');
     _phoneController = TextEditingController(text: user?.MobileNumber ?? '');
-    _emailController = TextEditingController(text: user?.email ?? '');
     _jmbgController = TextEditingController(text: user?.jmbg ?? '');
   }
 
@@ -56,100 +49,95 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: const NavBar(automaticallyImplyLeading: false),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/peakpx 1.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(
-                top: kToolbarHeight + 50,
-                bottom: kBottomNavigationBarHeight + 30,
-              ),
-              child: Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  final user = userProvider.user;
-                  if (user == null) {
-                    return const CircularProgressIndicator();
-                  }
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+      ),
+      body: Consumer<UserProvider>(
+        builder: (context, userProvider, child) {
+          final user = userProvider.user;
+          if (user == null) return const Center(child: CircularProgressIndicator());
 
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 35,
-                            backgroundColor: GlobalColors.darkGrey,
-                          ),
-                          const CircleAvatar(
-                            radius: 35,
-                            backgroundColor: Colors.transparent,
-                            child: Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Colors.black,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+              child: Column(
+                children: [
+                  // Avatar and name
+                  Center(
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 48,
+                          backgroundColor: GlobalColors.red,
+                          child: Text(
+                            (user.name != null && user.surname != null)
+                                ? '${user.name![0]}${user.surname![0]}'
+                                : "",
+                            style: const TextStyle(
+                                fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Opacity(
-                        opacity: 0.9,
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: GlobalColors.darkGrey,
-                            borderRadius: BorderRadius.circular(20),
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          "${user.name ?? ''} ${user.surname ?? ''}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
                           ),
-                          width: 350,
-                          child: Column(
-                            children: [
-                              _buildProfileField(
-                                icon: Icons.person,
-                                label: 'Ime',
-                                controller: _nameController,
-                              ),
-                              _buildProfileField(
-                                icon: Icons.person_outline,
-                                label: 'Prezime',
-                                controller: _surnameController,
-                              ),
-                              _buildProfileField(
-                                icon: Icons.email,
-                                label: 'Email',
-                                controller: _emailController,
-                              ),
-                              _buildProfileField(
-                                icon: Icons.contact_mail,
-                                label: 'JMBG',
-                                controller: _jmbgController,
-                              ),
-                              _buildProfileField(
-                                icon: Icons.phone,
-                                label: 'Broj telefona',
-                                controller: _phoneController,
-                              ),
-                            ],
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          user.email ?? "",
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 16,
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                        const SizedBox(height: 14),
+                        const Divider(
+                          color: Colors.white24,
+                          thickness: 1,
+                          endIndent: 24,
+                          indent: 24,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.09),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        _buildProfileField("Phone number", _phoneController.text, Icons.phone),
+                        Divider(color: Colors.grey[700], height: 32),
+                        _buildProfileField("JMBG", _jmbgController.text, Icons.credit_card),
+                        // Add/Edit button if needed
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
@@ -158,37 +146,21 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget _buildProfileField({
-    required IconData icon,
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        style: TextStyle(color: GlobalColors.white),
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: GlobalColors.red),
-          labelText: label,
-          labelStyle: TextStyle(color: GlobalColors.red),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: GlobalColors.red),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: GlobalColors.red),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: GlobalColors.red),
-          ),
-          filled: true,
-          fillColor: Colors.black,
+  Widget _buildProfileField(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: GlobalColors.red, size: 24),
+        const SizedBox(width: 18),
+        Expanded(
+            child: Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                )
+            )
         ),
-      ),
+      ],
     );
   }
 }

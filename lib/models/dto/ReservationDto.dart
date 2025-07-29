@@ -3,6 +3,7 @@ class Reservation {
   final String filmTitle;
   final String date;
   final String time;
+  final String status;
   final List<String> seats;
   final String? qrCodeBase64;
 
@@ -11,6 +12,7 @@ class Reservation {
     required this.filmTitle,
     required this.date,
     required this.time,
+    required this.status,
     required this.seats,
     this.qrCodeBase64,
   });
@@ -21,8 +23,9 @@ class Reservation {
       filmTitle: json["filmTitle"],
       date: json["date"],
       time: json["time"],
+      status: json["status"],
       seats: List<String>.from(json["seats"] ?? []),
-      qrCodeBase64: json["qrCodeBase64"],
+      qrCodeBase64: json["ticket"]?["qrCode"],
     );
   }
 }

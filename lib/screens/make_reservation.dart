@@ -258,7 +258,6 @@ class _MakeReservationState extends State<MakeReservation> {
                 onPressed: () async {
                   try {
                     final user = Provider.of<UserProvider>(context, listen: false).user;
-                   // final String userId = Provider.of<UserProvider>(context, listen: false).user?.jmbg ?? '0';
                     final String? userId = user?.jmbg;
 
                     List<Seat> seatsToReserve = selectedSeats.map((seatId) {
@@ -278,7 +277,7 @@ class _MakeReservationState extends State<MakeReservation> {
                     await reservationService.makeReservation(userId, projection.projectionId, seatsToReserve);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Uspešno ste rezervisali karte!")),
+                      const SnackBar(content: Text("You have successfully booked your tickets!")),
                     );
                     Navigator.pushReplacementNamed(context, '/tickets');
                     setState(() {
@@ -286,7 +285,7 @@ class _MakeReservationState extends State<MakeReservation> {
                     });
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Greška prilikom rezervacije: $e")),
+                      SnackBar(content: Text("Booking error: $e")),
                     );
                   }
                 },
@@ -296,7 +295,7 @@ class _MakeReservationState extends State<MakeReservation> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 child: const Text(
-                  "Rezerviši",
+                  "Reserve",
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ),

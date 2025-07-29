@@ -66,6 +66,17 @@ class _TicketsState extends State<Tickets> {
     }
   }
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'reserved':
+        return Colors.lightGreen;
+      case 'confirmed':
+        return Colors.lightBlue;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).user;
@@ -98,7 +109,6 @@ class _TicketsState extends State<Tickets> {
               color: Colors.black54,
             ),
           ),
-          // Sadržaj tela
           SafeArea(
             child: Container(
               padding: const EdgeInsets.all(20.0),
@@ -131,7 +141,7 @@ class _TicketsState extends State<Tickets> {
             title: 'Projections',
             icon: Icons.people_outline,
             onTap: () {
-              Navigator.pushNamed(context, '/projections');
+              Navigator.pushNamed(context, '/add-projection');
             },
           ),
         ],
@@ -158,7 +168,24 @@ class _TicketsState extends State<Tickets> {
       itemCount: myReservations.length,
       itemBuilder: (context, index) {
         final reservation = myReservations[index];
-        return Card(
+        return GestureDetector(
+            onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              backgroundColor: Colors.black87,
+              content: reservation.qrCodeBase64 != null
+                  ? Image.memory(
+                base64Decode(reservation.qrCodeBase64!),
+                width: 250,
+                height: 250,
+                fit: BoxFit.contain,
+              )
+                  : const Icon(Icons.qr_code, color: Colors.white24, size: 250),
+            ),
+          );
+        },
+        child: Card(
           color: Colors.grey[900],
           margin: const EdgeInsets.only(bottom: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -173,7 +200,8 @@ class _TicketsState extends State<Tickets> {
                       Text(
                         reservation.filmTitle,
                         style: const TextStyle(
-                            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -182,16 +210,30 @@ class _TicketsState extends State<Tickets> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Sedišta: ${reservation.seats.join(", ")}',
+                        'Seat: ${reservation.seats.join(", ")}',
                         style: const TextStyle(color: Colors.white54),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top:10),
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(reservation.status),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          reservation.status,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                // QR kod dekodiran iz base64
                 SizedBox(
-                  width: 80,
-                  height: 80,
+                  width: 90,
+                  height: 90,
                   child: reservation.qrCodeBase64 != null
                       ? Image.memory(
                     base64Decode(reservation.qrCodeBase64!),
@@ -202,6 +244,7 @@ class _TicketsState extends State<Tickets> {
               ],
             ),
           ),
+        ),
         );
       },
     );

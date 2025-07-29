@@ -11,6 +11,7 @@ import 'package:cinema_reservations_front/screens/welcome_screen.dart';
 import 'package:cinema_reservations_front/screens/home.dart';
 import 'package:provider/provider.dart';
 import 'package:cinema_reservations_front/providers/user_provider.dart';
+import 'package:cinema_reservations_front/screens/projections.dart';
 import 'package:cinema_reservations_front/screens/projection.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
         '/tickets': (context) => const Tickets(),
         '/camera' : (context) =>  QRScannerScreen(),
         '/films' : (context) => const FilmsScreen(),
+        '/add-projection' : (context) => const AddProjectionScreen(),
       },
     );
   }
