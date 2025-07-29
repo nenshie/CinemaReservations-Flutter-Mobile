@@ -44,11 +44,11 @@ class ReservationService {
 
     final response = await http.get(uri);
 
-    print('--- RESERVATION FETCH LOG ---');
-    print("URL: $uri");
-    print("Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
-    print('----------------------------');
+    // print('--- RESERVATION FETCH LOG ---');
+    // print("URL: $uri");
+    // print("Status code: ${response.statusCode}");
+    // print("Response body: ${response.body}");
+    // print('----------------------------');
 
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
@@ -60,18 +60,52 @@ class ReservationService {
 
   Future<List<Reservation>> getMyReservations(String userId) async {
     final uri = Uri.parse("$baseUrl/user/$userId");
-
     final response = await http.get(uri);
 
-    print('--- GET MY RESERVATIONS LOG ---');
-    print("URL: $uri");
-    print("Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
-    print('----------------------------');
-
+    // print('--- RESERVATION FETCH LOG ---');
+    // print("URL: $uri");
+    // print("Status code: ${response.statusCode}");
+    // print("Response body: ${response.body}");
+    // print('------------------------');
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      return data.map((resJson) => Reservation.fromJson(resJson)).toList();
+      List<Reservation> allReservations = [];
+      for (var resJson in data) {
+        final ticket = resJson['ticket'];
+        final status = resJson['status'];
+        final projection = ticket?['projection'];
+        final film = projection?['film'];
+        final seats = ticket?['seats'] ?? [ticket?['seat']];
+
+        if (seats is List) {
+          for (var seat in seats) {
+            allReservations.add(
+              Reservation(
+                reservationId: ticket?['ticketId'] ?? 0,
+                filmTitle: film?['title'] ?? '',
+                date: (projection?['date'] ?? '').toString().substring(0, 10),
+                time: (projection?['time'] ?? '').toString().substring(11, 16),
+                status: status,
+                seats: ['Row ${seat["rowNumber"]}, Seat ${seat["seatNumber"]}'],
+                qrCodeBase64: ticket?['qrCode'],
+              ),
+            );
+          }
+        } else if (seats != null) {
+          allReservations.add(
+            Reservation(
+              reservationId: ticket?['ticketId'] ?? 0,
+              filmTitle: film?['title'] ?? '',
+              date: (projection?['date'] ?? '').toString().substring(0, 10),
+              time: (projection?['time'] ?? '').toString().substring(11, 16),
+              status: status,
+              seats: ['Row ${seats["rowNumber"]}, Seat ${seats["seatNumber"]}'],
+              qrCodeBase64: ticket?['qrCode'],
+            ),
+          );
+        }
+      }
+      return allReservations;
     } else {
       throw Exception("Failed to load user reservations");
     }

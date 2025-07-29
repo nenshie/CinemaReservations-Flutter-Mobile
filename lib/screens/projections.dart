@@ -116,8 +116,8 @@ class _AddProjectionScreenState extends State<AddProjectionScreen> {
           : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Film Dropdown
             DropdownButtonFormField<Film>(
               dropdownColor: Colors.grey[900],
               value: selectedFilm,
@@ -129,10 +129,14 @@ class _AddProjectionScreenState extends State<AddProjectionScreen> {
                 );
               }).toList(),
               onChanged: (val) => setState(() => selectedFilm = val),
+              decoration: const InputDecoration(
+                labelText: 'Film',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
+              ),
             ),
             const SizedBox(height: 20),
 
-            // Room Dropdown
             DropdownButtonFormField<Room>(
               dropdownColor: Colors.grey[900],
               value: selectedRoom,
@@ -144,40 +148,80 @@ class _AddProjectionScreenState extends State<AddProjectionScreen> {
                 );
               }).toList(),
               onChanged: (val) => setState(() => selectedRoom = val),
+              decoration: const InputDecoration(
+                labelText: 'Room',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
-            // Date
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(
-                selectedDate == null
-                    ? 'Select Date'
-                    : DateFormat('yyyy-MM-dd').format(selectedDate!),
+            GestureDetector(
+              onTap: () => _selectDate(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[850],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today, color: Colors.white70),
+                    const SizedBox(width: 10),
+                    Text(
+                      selectedDate == null
+                          ? 'Select Date'
+                          : DateFormat('EEE, dd MMM yyyy').format(selectedDate!),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Time
-            ElevatedButton(
-              onPressed: () => _selectTime(context),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(
-                selectedTime == null
-                    ? 'Select Time'
-                    : selectedTime!.format(context),
+            GestureDetector(
+              onTap: () => _selectTime(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[850],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time, color: Colors.white70),
+                    const SizedBox(width: 10),
+                    Text(
+                      selectedTime == null
+                          ? 'Select Time'
+                          : selectedTime!.format(context),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
             const Spacer(),
-
-            ElevatedButton(
-              onPressed: _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 60),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                margin: const EdgeInsets.only(top: 20, bottom: 20),
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
               ),
-              child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),

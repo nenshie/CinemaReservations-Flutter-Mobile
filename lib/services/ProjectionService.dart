@@ -11,11 +11,11 @@ class ProjectionService {
 
     final response = await http.get(uri);
 
-    print('--- PROJECTION FETCH LOG ---');
-    print("URL: $uri");
-    print("Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
-    print('------------------------');
+    // print('--- PROJECTION FETCH LOG ---');
+    // print("URL: $uri");
+    // print("Status code: ${response.statusCode}");
+    // print("Response body: ${response.body}");
+    // print('------------------------');
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       print(data);
