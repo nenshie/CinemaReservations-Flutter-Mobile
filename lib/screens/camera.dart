@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import 'package:cinema_reservations_front/services/ReservationService.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
@@ -13,6 +15,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? _qrController;
   bool _isProcessing = false;
+
+  final ReservationService _reservationService = ReservationService();
+
 
   @override
   void reassemble() {
@@ -35,7 +40,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       ),
       body: Stack(
         children: [
-          // QR scanner
           QRView(
             key: qrKey,
             onQRViewCreated: _onQRViewCreated,
@@ -47,9 +51,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               cutOutSize: MediaQuery.of(context).size.width * 0.8,
             ),
           ),
-          // Show loading indicator while processing
           if (_isProcessing)
-            Center(
+            const Center(
               child: CircularProgressIndicator(),
             ),
         ],
@@ -57,33 +60,38 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     );
   }
 
-  Future<void> _simulateQRScan(String code) async {
-    if (!mounted || _isProcessing) return;
-
-    setState(() {
-      _isProcessing = true;
-    });
-
-    await Future.delayed(Duration(seconds: 1));
-
-    print("Scanned QR Code: $code");
-
-    setState(() {
-      _isProcessing = false;
-    });
-  }
-
   void _onQRViewCreated(QRViewController controller) {
     setState(() {
       _qrController = controller;
     });
 
-    // Listen for scanned data stream
     controller.scannedDataStream.listen((scanData) async {
-      if (scanData.code != null && !scanData.code!.isEmpty) {
+      final code = scanData.code?.trim();
+      if (code != null && code.isNotEmpty && !_isProcessing) {
         _qrController?.pauseCamera();
-        await _simulateQRScan(scanData.code!);
-        _qrController?.resumeCamera();
+        setState(() {
+          _isProcessing = true;
+        });
+
+        try {
+
+          bool success = await _reservationService.confirmReservationFromQr(code);
+
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reservation confirmed successfully!')));
+            Navigator.pop(context);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to confirm reservation.')));
+            _qrController?.resumeCamera();
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+          _qrController?.resumeCamera();
+        } finally {
+          setState(() {
+            _isProcessing = false;
+          });
+        }
       }
     });
   }

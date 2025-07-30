@@ -91,7 +91,7 @@ class _TicketsState extends State<Tickets> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: GlobalColors.black,
+        backgroundColor: GlobalColors.black, automaticallyImplyLeading: false,
         title: Text(
           role == 'Admin' ? 'Admin Panel' : 'My Tickets',
           style: const TextStyle(color: Colors.white),

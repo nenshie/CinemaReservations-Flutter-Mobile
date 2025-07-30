@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:cinema_reservations_front/models/dto/OccupiedSeatDto.dart';
 
 class SeatService {
-  static const String ipPort = "10.0.2.2:5215";
+  static const String ipPort = "172.20.10.5:5215";
   static const String baseUrl = "http://$ipPort/api/seat";
 
   Future<List<OccupiedSeat>> fetchSeatsWithAvailability(int projectionId) async {

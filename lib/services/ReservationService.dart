@@ -5,7 +5,7 @@ import 'package:cinema_reservations_front/models/dto/SeatDto.dart';
 import 'package:http/http.dart' as http;
 
 class ReservationService {
-  static const String ipPort = "10.0.2.2:5215";
+  static const String ipPort = "172.20.10.5:5215";
   static const String baseUrl = "http://$ipPort/api/reservation";
 
 
@@ -111,15 +111,19 @@ class ReservationService {
     }
   }
 
-  Future<bool> confirmReservationFromQr(String qrContent, String userId) async {
+  Future<bool> confirmReservationFromQr(String qrContent) async {
+    final url = Uri.parse("$baseUrl/confirm-from-qr");
+
+    final body = jsonEncode({
+      'qrContent': qrContent
+    });
+
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:5215/api/reservation/confirm-from-qr'),
+      url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "qrContent": qrContent,
-        "userId": userId,
-      }),
+      body: body
     );
+    print('Sending QR to backend: $qrContent');
 
     if (response.statusCode == 200) {
       return true;
