@@ -3,7 +3,7 @@ import 'package:cinema_reservations_front/models/dto/RoomDto.dart';
 import 'package:http/http.dart' as http;
 
 class RoomService {
-  static const String ipPort = "10.0.2.2:5215";
+  static const String ipPort = "172.20.10.5:5215";
   static const String baseUrl = "http://$ipPort/api/room";
 
   static Future<List<Room>> fetchAllRooms() async {

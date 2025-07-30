@@ -6,8 +6,13 @@ import '../providers/user_provider.dart';
 
 class NavBar extends StatefulWidget implements PreferredSizeWidget {
   final bool automaticallyImplyLeading;
+  final String title;
 
-  const NavBar({super.key, this.automaticallyImplyLeading = false});
+  const NavBar({
+    super.key,
+    this.automaticallyImplyLeading = false,
+    required this.title,
+  });
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -28,8 +33,8 @@ class _NavBarState extends State<NavBar> {
       ),
       centerTitle: true,
       automaticallyImplyLeading: widget.automaticallyImplyLeading,
-      title:Text(
-        "CINEFLIX",
+      title: Text(
+        widget.title,
         style: TextStyle(
           color: GlobalColors.red,
           fontSize: 25,

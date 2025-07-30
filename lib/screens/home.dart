@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _filmsFuture = FilmService.fetchAllFilms();
+    _filmsFuture = FilmService.fetchAllFilms(5);
   }
 
   void _onNavBarTap(int index) {
@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       backgroundColor: GlobalColors.black,
-      appBar: const NavBar(),
+      appBar: const NavBar(title: 'CINEFLIX'),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(

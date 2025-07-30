@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 class ProjectionService {
-  static const String ipPort = "10.0.2.2:5215";
+  static const String ipPort = "172.20.10.5:5215";
   static const String baseUrl = "http://$ipPort/api/projection";
 
   Future<List<Projection>> fetchAllProjectoins() async {
@@ -28,15 +29,20 @@ class ProjectionService {
   static Future<bool> addProjection({
     required int filmId,
     required int roomId,
-    required String date,
+    required DateTime date,
+    required TimeOfDay time,
   }) async {
     final uri = Uri.parse(baseUrl);
+
+    final projectionDate = DateTime(date.year, date.month, date.day);
+
+    final projectionTime = DateTime(1, 1, 1, time.hour, time.minute);
 
     final payload = {
       "filmId": filmId,
       "roomId": roomId,
-      "date": date.split("T")[0],
-      "time": date.split("T")[1],
+      "date": projectionDate.toIso8601String(),
+      "time": projectionTime.toIso8601String(),
     };
 
     final response = await http.post(

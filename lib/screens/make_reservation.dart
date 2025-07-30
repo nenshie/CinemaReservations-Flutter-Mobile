@@ -108,7 +108,10 @@ class _MakeReservationState extends State<MakeReservation> {
   Widget build(BuildContext context) {
     final projection = ModalRoute.of(context)!.settings.arguments as Projection;
     print('Number of rows: ${projection.room.numberOfRows}');
-    print('Number of rows: ${projection.room.seatsPerRow}');
+    print('Seats per row: ${projection.room.seatsPerRow}');
+
+    final totalSeats = projection.room.numberOfRows * projection.room.seatsPerRow;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -174,8 +177,8 @@ class _MakeReservationState extends State<MakeReservation> {
           const Divider(color: Colors.white24),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
-            child:
-            Text("Choose seats", style: TextStyle(color: Colors.white, fontSize: 18)),
+            child: Text("Choose seats",
+                style: TextStyle(color: Colors.white, fontSize: 18)),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 15),
@@ -198,52 +201,85 @@ class _MakeReservationState extends State<MakeReservation> {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: SingleChildScrollView(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: List.generate(
                   projection.room.numberOfRows,
                       (rowIndex) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        projection.room.seatsPerRow,
-                            (seatIndex) {
-                          final rowNumber = rowIndex + 1;
-                          final seatNumberInRow = seatIndex + 1;
+                    final rowNumber = rowIndex + 1;
 
-                          final seatId = '$rowNumber-$seatNumberInRow';  // string ID
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        const seatIconSize = 33.0;
+                        const seatPadding = 10.0;
+                        int seatsPerLine =
+                        (constraints.maxWidth / (seatIconSize + seatPadding))
+                            .floor();
 
-                          final isTaken = isSeatTaken(rowNumber, seatNumberInRow);
-                          final isSelected = selectedSeats.contains(seatId);
+                        final maxSeatsInRow = projection.room.seatsPerRow;
+                        seatsPerLine = seatsPerLine > maxSeatsInRow
+                            ? maxSeatsInRow
+                            : seatsPerLine;
 
-                          return GestureDetector(
-                            onTap: () {
-                              if (!isTaken) {
-                                setState(() {
-                                  if (isSelected) {
-                                    selectedSeats.remove(seatId);
-                                  } else {
-                                    selectedSeats.add(seatId);
-                                  }
-                                });
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Icon(
-                                Icons.chair,
-                                color: isTaken
-                                    ? Colors.grey
-                                    : isSelected
-                                    ? GlobalColors.red
-                                    : Colors.white,
-                                size: 33,
-                              ),
+                        List<Widget> seatLines = [];
+                        for (int startSeat = 0;
+                        startSeat < maxSeatsInRow;
+                        startSeat += seatsPerLine) {
+                          final endSeat = (startSeat + seatsPerLine > maxSeatsInRow)
+                              ? maxSeatsInRow
+                              : startSeat + seatsPerLine;
+                          final seatsInThisLine = endSeat - startSeat;
+
+                          seatLines.add(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(seatsInThisLine, (index) {
+                                final seatNumberInRow = startSeat + index + 1;
+                                final seatId = '$rowNumber-$seatNumberInRow';
+
+                                final isTaken =
+                                isSeatTaken(rowNumber, seatNumberInRow);
+                                final isSelected = selectedSeats.contains(seatId);
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (!isTaken) {
+                                      setState(() {
+                                        if (isSelected) {
+                                          selectedSeats.remove(seatId);
+                                        } else {
+                                          selectedSeats.add(seatId);
+                                        }
+                                      });
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Icon(
+                                      Icons.chair,
+                                      color: isTaken
+                                          ? Colors.grey
+                                          : isSelected
+                                          ? GlobalColors.red
+                                          : Colors.white,
+                                      size: seatIconSize,
+                                    ),
+                                  ),
+                                );
+                              }),
                             ),
                           );
-                        },
-                      ),
+                        }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: seatLines,
+                        );
+                      }),
                     );
                   },
                 ),
@@ -257,7 +293,8 @@ class _MakeReservationState extends State<MakeReservation> {
               child: ElevatedButton(
                 onPressed: () async {
                   try {
-                    final user = Provider.of<UserProvider>(context, listen: false).user;
+                    final user =
+                        Provider.of<UserProvider>(context, listen: false).user;
                     final String? userId = user?.jmbg;
 
                     List<Seat> seatsToReserve = selectedSeats.map((seatId) {
@@ -274,10 +311,13 @@ class _MakeReservationState extends State<MakeReservation> {
                       );
                     }).toList();
 
-                    await reservationService.makeReservation(userId, projection.projectionId, seatsToReserve);
+                    await reservationService.makeReservation(
+                        userId, projection.projectionId, seatsToReserve);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("You have successfully booked your tickets!")),
+                      const SnackBar(
+                          content:
+                          Text("You have successfully booked your tickets!")),
                     );
                     Navigator.pushReplacementNamed(context, '/tickets');
                     setState(() {
@@ -291,8 +331,10 @@ class _MakeReservationState extends State<MakeReservation> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: GlobalColors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 60, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                 ),
                 child: const Text(
                   "Reserve",

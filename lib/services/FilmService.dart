@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cinema_reservations_front/models/dto/FilmDto.dart';
 class FilmService {
-  static const String ipPort = "10.0.2.2:5215";
+  static const String ipPort = "172.20.10.5:5215";
   static const String baseUrl = "http://$ipPort/api/film";
 
-  static Future<List<Film>> fetchAllFilms() async {
+  static Future<List<Film>> fetchAllFilms(int pageSize) async {
 
     final queryParameters = {
       'filterBy': 'genre',
@@ -13,7 +13,7 @@ class FilmService {
       'sortBy': 'Time',
       'ascending': 'true',
       'pageNumber': '1',
-      'pageSize': '5',
+      'pageSize': pageSize.toString(),
     };
 
     final uri = Uri.parse(baseUrl).replace(queryParameters: queryParameters);
