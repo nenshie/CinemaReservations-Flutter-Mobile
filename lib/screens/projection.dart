@@ -1,6 +1,8 @@
 import 'package:cinema_reservations_front/components/bottom_nav_bar.dart';
 import 'package:cinema_reservations_front/models/dto/ProjectoinDto.dart';
+import 'package:cinema_reservations_front/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../services/ProjectionService.dart';
 
@@ -67,88 +69,98 @@ class _ProjectionsState extends State<Projections> {
   }
 
   Widget buildFilmCard(Projection projection) {
-    return GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/makeReservation',
-            arguments: projection,
-          );
-        },
-    child:  Card(
-      color: Colors.grey[900],
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SizedBox(
-        height: 140,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
-              child: Image.network(
-                projection.film.posterUrl,
-                width: 100,
-                height: 140,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 100,
-                    height: 140,
-                    color: Colors.grey.shade800,
-                    child: const Icon(Icons.broken_image, color: Colors.white),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      projection.film.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          formatDuration(projection.film.duration),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          formatProjectionDateTime(projection.date, projection.time),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+      final userProvider = Provider.of<UserProvider>(context);
+      final user = userProvider.user;
+      final String role = user?.role ?? 'Client';
+
+      Widget card = Card(
+        color: Colors.grey[900],
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: SizedBox(
+          height: 140,
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+                child: Image.network(
+                  projection.film.posterUrl,
+                  width: 100,
+                  height: 140,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 100,
+                      height: 140,
+                      color: Colors.grey.shade800,
+                      child: const Icon(Icons.broken_image, color: Colors.white),
+                    );
+                  },
                 ),
               ),
-            )
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        projection.film.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formatDuration(projection.film.duration),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            formatProjectionDateTime(projection.date, projection.time),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
-      ),
-    ),
-    );
+      );
+
+      if (role != 'Admin') {
+        card = GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/makeReservation',
+              arguments: projection,
+            );
+          },
+          child: card,
+        );
+      }
+
+      return card;
   }
 
 
